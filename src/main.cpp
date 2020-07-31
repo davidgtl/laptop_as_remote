@@ -82,18 +82,6 @@ void client() {
     socket.close();
 }
 
-void device_changed(int id, devicewatcher::status status) {
-
-    switch (status) {
-        case devicewatcher::CREATED:
-            printf("device %d was created\n", id); break;
-        case devicewatcher::MODIFIED:
-            printf("device %d was modified\n", id); break;
-        case devicewatcher::DELETED:
-            printf("device %d was deleted\n", id); break;
-    }
-}
-
 void test() {
 
     lap_rem::input::devices::query();

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include "util/devicewatcher.h"
 
 
 namespace lap_rem::input {
@@ -29,56 +30,44 @@ namespace lap_rem::input {
 
     class devices {
     private:
+
+        int watched_ids[31];
+
+        static void device_changed(int id, devicewatcher::status status);
+
         inline static std::unordered_map<u_int, device_descriptor> _devices = {};
         inline static constexpr char path[] = "/del_dev/input";
+        inline static devicewatcher dw{path, device_changed};
 
-        static void populate(device_descriptor& dd, std::string& line){
+        static void populate(device_descriptor &dd, std::string &line) {
             int split = line.find(':');
             auto property = line.substr(0, split);
             auto value = line.substr(split + 1);
 
             printf("%s: %s\n", property.c_str(), value.c_str());
 
-            if(property == "Name")
+            if (property == "Name")
                 dd.name = value;
-            else if(property == "Unique")
+            else if (property == "Unique")
                 dd.unique = value;
-            else if(property == "Vendor")
+            else if (property == "Vendor")
                 dd.vendor = std::stoi(value);
-            else if(property == "Product")
+            else if (property == "Product")
                 dd.product = std::stoi(value);
-            else if(property == "Logical location")
+            else if (property == "Logical location")
                 dd.logical_location = value;
-            else if(property == "Physical location")
+            else if (property == "Physical location")
                 dd.physical_location = value;
-            else if(property == "Bus type")
+            else if (property == "Bus type")
                 dd.bus_type = std::stoi(value);
-            else if(property == "Firmware version")
+            else if (property == "Firmware version")
                 dd.firmware_version = std::stoi(value);
             else std::cout << "Could not find property " << property << "\n";
 
         }
 
     public:
-        static void query() {
-            devices::_devices.clear();
-
-            for (const auto &entry : std::filesystem::directory_iterator(path)) {
-                int id = std::stoi(entry.path().filename());
-                printf("Found device %d:\n", id);
-
-                device_descriptor dd;
-
-                std::ifstream file(entry.path());
-                std::string line;
-                while (std::getline(file, line))
-                    populate(dd, line);
-
-                printf("\n");
-
-                devices::_devices[id] = dd;
-            }
-        }
+        static void query();
     };
 }
 

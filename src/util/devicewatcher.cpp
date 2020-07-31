@@ -24,7 +24,7 @@ void devicewatcher::start() {
 
     }
 
-    _internal.wd = inotify_add_watch(_internal.fd, "/del_dev/input", IN_MODIFY | IN_CREATE | IN_DELETE);
+    _internal.wd = inotify_add_watch(_internal.fd, path.c_str(), IN_MODIFY | IN_CREATE | IN_DELETE);
 
     _watcher = new pthread_t;
     int rc = pthread_create(watcher, nullptr, worker, (void *) this);
@@ -57,8 +57,9 @@ void devicewatcher::stop() {
     close(_internal.fd);
 }
 
-devicewatcher::devicewatcher(void (*callback)(int, status)) {
+devicewatcher::devicewatcher(const std::string &path, void (*callback)(int, status)) {
     this->_internal.callback = callback;
+    this->path = path;
 }
 
 [[noreturn]] void *worker(void *arg) {

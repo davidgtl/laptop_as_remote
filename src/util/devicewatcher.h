@@ -17,7 +17,7 @@ public:
         void (*callback)(int device_id, status status);
     } _internal = {};
 
-    explicit devicewatcher(void (*callback)(int device_id, status status));
+    explicit devicewatcher(const std::string& path, void (*callback)(int device_id, status status));
 
 
 /* too much work to generalise, features would remain unused
@@ -45,6 +45,7 @@ public:
     void stop();
 
 private:
+    std::string path;
     void *_watcher = nullptr;
 
 };

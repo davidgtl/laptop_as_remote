@@ -4,9 +4,15 @@ project(laptop_remote)
 set(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+file(GLOB_RECURSE SOURCES "src/*.h" "src/*.cpp")
+
 find_package(Boost 1.71.0 REQUIRED system program_options)
 
-add_executable(laptop_remote src/main.cpp src/network.cpp src/network.h src/input/input_driver.cpp src/input/input_driver.h src/input/devices_descriptors.h src/util.h src/util/devicewatcher.cpp src/util/devicewatcher.h)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(laptop_remote ${Boost_LIBRARIES})
-target_link_libraries(laptop_remote rt)
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+# set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries")
+include_directories("${SRC_DIR}")
+
+target_link_libraries(${PROJECT_NAME}  ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}  rt)
