@@ -2,6 +2,8 @@
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/program_options.hpp>
+#include "input/devices_descriptors.h"
+#include "util/devicewatcher.h"
 
 namespace po = boost::program_options;
 
@@ -22,6 +24,8 @@ void server() {
     acceptor.accept(socket);
 
     cout << "client connected\n";
+
+    strerror(errno);
 
 
     vector<char> buffy(2048);
@@ -78,6 +82,30 @@ void client() {
     socket.close();
 }
 
+void device_changed(int id, devicewatcher::status status) {
+
+    switch (status) {
+        case devicewatcher::CREATED:
+            printf("device %d was created\n", id); break;
+        case devicewatcher::MODIFIED:
+            printf("device %d was modified\n", id); break;
+        case devicewatcher::DELETED:
+            printf("device %d was deleted\n", id); break;
+    }
+}
+
+void test() {
+
+    lap_rem::input::devices::query();
+
+    devicewatcher fw(device_changed);
+    fw.start();
+
+    sleep(20);
+
+    fw.stop();
+
+}
 
 int main(int ac, char *av[]) {
     using namespace std;
@@ -86,7 +114,7 @@ int main(int ac, char *av[]) {
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("server,s", "start listening for clints")
+            ("server,s", "start listening for clients")
             ("client,c", "start search and connect to a local server");
 
     po::variables_map vm;
@@ -95,8 +123,9 @@ int main(int ac, char *av[]) {
 
     if (vm.count("server"))
         server();
-    if (vm.count("client"))
+    else if (vm.count("client"))
         client();
+    else test();
 
     return 0;
 }
