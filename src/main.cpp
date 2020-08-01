@@ -2,49 +2,26 @@
 #include <boost/program_options.hpp>
 #include "input/devices_descriptors.h"
 #include "util/devicewatcher.h"
+#include "network/discovery.h"
 
 namespace po = boost::program_options;
 namespace lap_rem {
     const int port = 2222;
 
     void server() {
-
+        using namespace network;
+        discovery d(57897);
+        d.start_listener("server1");
+        std::string line;
+        std::cin>>line;
     }
 
     void client() {
-        using namespace boost::asio;
-        using namespace std;
-
-        cout << "starting client..\n";
-
-        boost::asio::io_service ios;
-
-        boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string("192.168.1.105"), port);
-
-        boost::asio::ip::tcp::socket socket(ios);
-
-        socket.connect(endpoint);
-
-        cout << "server connected\n";
-
-        boost::array<char, 128> buf{};
-
-        string message;
-        boost::system::error_code error;
-
-        vector<char> buffy;
-        while (true) {
-            cin >> message;
-
-            socket.send(boost::asio::buffer(message));
-            cout << "sent: " << message << "\n";
-
-            if (message == "exit")
-                break;
-        }
-        //std::copy(message.begin(),message.end(),buf.begin());
-        //socket.write_some(boost::asio::buffer(message), error);
-        socket.close();
+        using namespace network;
+        discovery d(57897);
+        d.search_listeners();
+        std::string line;
+        std::cin>>line;
     }
 
     void config() {
@@ -68,12 +45,12 @@ namespace lap_rem {
 
         lap_rem::input::devices::query();
 
-        devicewatcher fw(device_changed);
+        /*devicewatcher fw(device_changed);
         fw.start();
 
         sleep(20);
 
-        fw.stop();
+        fw.stop();*/
 
     }
 }

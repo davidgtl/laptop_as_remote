@@ -17,32 +17,29 @@ namespace lap_rem::network {
 
             acceptor.accept(socket);
 
-
             while (true) {
                 try {
                     int msg_len = socket.receive(boost::asio::buffer(buffy));
                     string message(buffy.begin(), buffy.begin() + msg_len);
 
-                    std::cout << "received: " << message << "\n";
+                    callback->on_message(buffy.data(), msg_len);
 
-                    if (message == "exit")
-                        break;
                 } catch (std::exception const &ex) {
                     break;
-
                 }
             }
 
-            socket.close();
+            //socket.close();
         }
     }
 
     void server::start() {
-
+        worker = new std::thread(&server::loop, this);
     }
 
-    server::server(int port) {
+    server::server(int port, Imessage_callback& mc) {
         this->port = port;
+        this->callback = &mc;
     }
 
 }

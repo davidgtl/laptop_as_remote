@@ -20,7 +20,7 @@ public:
     explicit devicewatcher(const std::string& path, void (*callback)(int device_id, status status));
 
 
-/* too much work to generalise, features would remain unused
+// too much work to generalise, features would remain unused
 //    enum events {
 //        IN_ACCESS = 0x00000001,    /* File was accessed.  */
 //        IN_MODIFY = 0x00000002,    /* File was modified.  */
