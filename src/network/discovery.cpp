@@ -76,11 +76,12 @@ namespace lap_rem::network {
             socket.send_to(boost::asio::buffer(message), broadcast_endpoint);
             std::this_thread::sleep_for(current_timeout * 1ms);
 
-            while (socket.available()) {
-                cout << "current_timeout: " << current_timeout << "\n";
+            if (socket.available()) {
+                cout << "ping: " << current_timeout << "ms\n";
                 int msg_len = socket.receive_from(boost::asio::buffer(buffy), remote_endpoint, 0, error);
                 cout << "Server connected: " << boost::lexical_cast<std::string>(remote_endpoint) << "\n";
                 cout << "Received from server: " << std::string(buffy.begin(), buffy.begin() + msg_len) << "\n";
+                break;
             }
             current_timeout *= 2;
         }
