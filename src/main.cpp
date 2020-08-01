@@ -1,6 +1,4 @@
 #include <iostream>
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
 #include <boost/program_options.hpp>
 #include "input/devices_descriptors.h"
 #include "util/devicewatcher.h"
@@ -10,40 +8,7 @@ namespace lap_rem {
     const int port = 2222;
 
     void server() {
-        using namespace boost::asio;
-        using namespace boost::asio::ip;
-        using namespace std;
 
-        cout << "starting server..\n";
-
-
-        boost::asio::io_service ios;
-        tcp::acceptor acceptor(ios, tcp::endpoint(ip::address_v6::any(), port));
-        tcp::socket socket(ios);
-
-        acceptor.accept(socket);
-
-        cout << "client connected\n";
-
-        strerror(errno);
-
-
-        vector<char> buffy(2048);
-
-        while (true) {
-            int msg_len = socket.receive(boost::asio::buffer(buffy));
-            string message(buffy.begin(), buffy.begin() + msg_len);
-            cout << "received: " << message << "\n";
-
-            if (message == "exit")
-                break;
-        }
-
-        /*using namespace boost::asio;
-        ip::tcp::acceptor acceptor(my_io_context, my_endpoint);
-        ip::tcp::socket socket(my_io_context);
-        acceptor.accept(socket);*/
-        socket.close();
     }
 
     void client() {
