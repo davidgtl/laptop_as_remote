@@ -19,6 +19,7 @@ namespace lap_rem::network {
 
             while (true) {
                 try {
+                    // TODO: spam test to see if more than one send can be received
                     int msg_len = socket.receive(boost::asio::buffer(buffy));
                     string message(buffy.begin(), buffy.begin() + msg_len);
 

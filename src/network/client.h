@@ -11,14 +11,22 @@ namespace lap_rem::network {
     private:
         int port;
 
-        void loop();
-
-        void broadcasst_search_server();
-
-        std::thread *worker;
+        boost::asio::ip::address addr;
+        boost::asio::ip::tcp::socket *socket = nullptr;
+        std::thread *worker = nullptr;
 
     public:
-        client(int port);
+        client(const boost::asio::ip::address &addr, int port);
+
+        void connect();
+
+        void disconnect();
+
+        template<typename T>
+        void send(const T &data) {
+            socket->send(boost::asio::buffer(data));
+        }
+
 
     };
 

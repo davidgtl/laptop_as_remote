@@ -1,8 +1,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
-#include "input/devices_descriptors.h"
 #include "util/devicewatcher.h"
-#include "network/discovery.h"
+#include "network/network.h"
 
 namespace po = boost::program_options;
 namespace lap_rem {
@@ -20,15 +19,21 @@ namespace lap_rem {
         using namespace network;
         discovery d(57897);
         boost::asio::ip::address addr;
-        if (d.search_listeners("server1", addr))
+        if (d.search_listeners("server1", addr)) {
             std::cout << "Server found\n";
+
+            network::client client(addr, 57896);
+            client.connect();
+            client.send("hello");
+
+        }
         else
             std::cout << "Server not found\n";
 
     }
 
     void config() {
-        using namespace input;
+        /*using namespace input;
         devices::query();
 
         std::cout << "Please enter the ids of devices to monitor:\n";
@@ -39,14 +44,14 @@ namespace lap_rem {
         std::istringstream sstr(input);
         int id;
         while (sstr >> id)
-            devices::watch(id);
+            devices::watch(id);*/
 
 
     }
 
     void test() {
 
-        lap_rem::input::devices::query();
+        //lap_rem::input::devices::query();
 
         /*devicewatcher fw(device_changed);
         fw.start();

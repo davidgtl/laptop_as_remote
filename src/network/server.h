@@ -11,13 +11,14 @@ namespace lap_rem::network {
         virtual void on_message(char* message, int size) = 0;
     };
 
+
     class server {
     private:
         int port;
 
         void loop();
 
-        std::thread *worker;
+        std::thread *worker = nullptr;
         Imessage_callback *callback;
 
     public:
