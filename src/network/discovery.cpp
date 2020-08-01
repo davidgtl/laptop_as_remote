@@ -32,7 +32,7 @@ namespace lap_rem::network {
             try {
                 int msg_len = socket.receive_from(boost::asio::buffer(buffy), remote_endpoint, 0, error);
 
-                cout << "Client connected: " << boost::lexical_cast<std::string>(socket.remote_endpoint()) << "\n";
+                cout << "Client connected: " << boost::lexical_cast<std::string>(remote_endpoint) << "\n";
                 cout << "Received: " << std::string(buffy.begin(), buffy.begin() + msg_len) << "\n";
 
                 if (std::string(buffy.begin(), buffy.begin() + msg_len) != "searching") {
@@ -76,13 +76,13 @@ namespace lap_rem::network {
             socket.send_to(boost::asio::buffer(message), broadcast_endpoint);
             std::this_thread::sleep_for(current_timeout * 1ms);
 
-            if (socket.available()) {
+            while (socket.available()) {
+                cout << "current_timeout: " << current_timeout << "\n";
                 int msg_len = socket.receive_from(boost::asio::buffer(buffy), remote_endpoint, 0, error);
-                cout << "Server connected: " << boost::lexical_cast<std::string>(socket.remote_endpoint()) << "\n";
+                cout << "Server connected: " << boost::lexical_cast<std::string>(remote_endpoint) << "\n";
                 cout << "Received from server: " << std::string(buffy.begin(), buffy.begin() + msg_len) << "\n";
-                break;
-            } else
-                current_timeout *= 2;
+            }
+            current_timeout *= 2;
         }
 
         socket.close();
