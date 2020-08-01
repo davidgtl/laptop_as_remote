@@ -8,7 +8,7 @@ namespace lap_rem::network {
         this->port = port;
     }
 
-    void discovery::start_listener(const std::string& reply) {
+    void discovery::start_listener(const std::string &reply) {
         this->reply = reply;
         worker = new std::thread(&discovery::loop_listener, this);
     }
@@ -51,7 +51,7 @@ namespace lap_rem::network {
 
     }
 
-    void discovery::search_listeners() {
+    bool discovery::search_listeners(const std::string &target_reply, boost::asio::ip::address &target_address) {
 
         using namespace boost::asio;
         using namespace boost::asio::ip;
@@ -71,22 +71,30 @@ namespace lap_rem::network {
 
         vector<char> buffy(2048);
         int current_timeout = 1; //1ms
+        bool found = false;
+
         for (int i = 0; i <= 6; i++) { //up to 64ms round trip
 
             socket.send_to(boost::asio::buffer(message), broadcast_endpoint);
             std::this_thread::sleep_for(current_timeout * 1ms);
 
-            if (socket.available()) {
-                cout << "ping: " << current_timeout << "ms\n";
+            while (socket.available()) {
                 int msg_len = socket.receive_from(boost::asio::buffer(buffy), remote_endpoint, 0, error);
-                cout << "Server connected: " << boost::lexical_cast<std::string>(remote_endpoint) << "\n";
-                cout << "Received from server: " << std::string(buffy.begin(), buffy.begin() + msg_len) << "\n";
-                break;
+                std::string reply(buffy.begin(), buffy.begin() + msg_len);
+                cout << "Found server " << boost::lexical_cast<std::string>(remote_endpoint)
+                     << " with reply " << reply << "\n";
+                if(reply == target_reply) {
+                    target_address = remote_endpoint.address();
+                    found = true;
+                    goto close;
+                }
             }
             current_timeout *= 2;
         }
 
+        close:
         socket.close();
+        return found;
 
     }
 }

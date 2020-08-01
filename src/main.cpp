@@ -13,15 +13,18 @@ namespace lap_rem {
         discovery d(57897);
         d.start_listener("server1");
         std::string line;
-        std::cin>>line;
+        std::cin >> line;
     }
 
     void client() {
         using namespace network;
         discovery d(57897);
-        d.search_listeners();
-        std::string line;
-        std::cin>>line;
+        boost::asio::ip::address addr;
+        if (d.search_listeners("server1", addr))
+            std::cout << "Server found\n";
+        else
+            std::cout << "Server not found\n";
+
     }
 
     void config() {
@@ -54,6 +57,7 @@ namespace lap_rem {
 
     }
 }
+
 int main(int ac, char *av[]) {
     using namespace std;
     using namespace lap_rem;
@@ -64,7 +68,7 @@ int main(int ac, char *av[]) {
             ("help", "produce help message")
             ("server,s", "start listening for clients")
             ("client,c", "start search and connect to a local server");
-            ("config", "choose which devices to monitor");
+    ("config", "choose which devices to monitor");
 
     po::variables_map vm;
     po::store(po::parse_command_line(ac, av, desc), vm);
