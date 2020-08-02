@@ -5,4 +5,5 @@
 namespace tests::callbacks{
     using namespace gcallbk;
     void test1();
+    void test2();
 }
