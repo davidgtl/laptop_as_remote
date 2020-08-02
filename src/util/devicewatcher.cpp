@@ -6,87 +6,87 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/inotify.h>
-
-static constexpr u_int EVENT_SIZE = sizeof(struct inotify_event);
-static constexpr u_int BUF_LEN = 1024 * (EVENT_SIZE + 64);
+#include <util/callback.hpp>
 
 #define watcher ((pthread_t *) _watcher)
 
-[[noreturn]] void *worker(void *arg);
+namespace lap_rem::input {
 
-void devicewatcher::start() {
-    if (watcher != nullptr)
-        return;
-
-    _internal.fd = inotify_init();
-    if (_internal.fd < 0) {
-        printf("inotify_init error\n");
-
-    }
-
-    _internal.wd = inotify_add_watch(_internal.fd, path.c_str(), IN_MODIFY | IN_CREATE | IN_DELETE);
-
-    _watcher = new pthread_t;
-    int rc = pthread_create(watcher, nullptr, worker, (void *) this);
-    if (rc)
-        printf("pthread_create error code: %d\n", rc);
-
-}
-
-void devicewatcher::stop() {
-    if (watcher == nullptr)
-        return;
-
-    int rc;
-
-    rc = pthread_cancel(*watcher);
-
-    if (rc != 0)
-        printf("pthread_cancel error code %d", rc);
-
-    void *res;
-    rc = pthread_join(*watcher, &res);
-    if (rc != 0)
-        printf("pthread_join error code %d", rc);
-
-    if (res != PTHREAD_CANCELED)
-        printf("thread was not canceled normally");
+    static constexpr u_int EVENT_SIZE = sizeof(struct inotify_event);
+    static constexpr u_int BUF_LEN = 1024 * (EVENT_SIZE + 64);
 
 
-    inotify_rm_watch(_internal.fd, _internal.wd);
-    close(_internal.fd);
-}
+    void *loop(void* arg) {
+        auto* ref = (devicewatcher*)arg;
 
-devicewatcher::devicewatcher(const std::string &path, void (*callback)(int, status)) {
-    this->_internal.callback = callback;
-    this->path = path;
-}
+        char buffer[BUF_LEN];
 
-[[noreturn]] void *worker(void *arg) {
+        while (ref->fd >= 0) { // useless condition to get a big yellow warning out of my face
+            int length = read(ref->fd, buffer, BUF_LEN);
 
-    auto *fw = (devicewatcher *) arg;
-    int fd = fw->_internal.fd;
-    char buffer[BUF_LEN];
+            if (length < 0) printf("inotify read error");
 
-    while (true) {
-        int length = read(fd, buffer, BUF_LEN);
+            for (int i = 0; i < length;) {
+                struct inotify_event *event = (struct inotify_event *) &buffer[i];
 
-        if (length < 0) printf("inotify read error");
+                if (!event->len || event->mask & IN_ISDIR) continue;
 
-        for (int i = 0; i < length;) {
-            struct inotify_event *event = (struct inotify_event *) &buffer[i];
+                if (event->mask & IN_CREATE)
+                    ref->_callback(atoi(event->name), devicewatcher::status::CREATED);
+                else if (event->mask & IN_DELETE)
+                    ref->_callback(atoi(event->name), devicewatcher::status::DELETED);
+                else if (event->mask & IN_MODIFY)
+                    ref->_callback(atoi(event->name), devicewatcher::status::MODIFIED);
 
-            if (!event->len || event->mask & IN_ISDIR) continue;
-
-            if (event->mask & IN_CREATE)
-                fw->_internal.callback(atoi(event->name), devicewatcher::status::CREATED);
-            else if (event->mask & IN_DELETE)
-                fw->_internal.callback(atoi(event->name), devicewatcher::status::DELETED);
-            else if (event->mask & IN_MODIFY)
-                fw->_internal.callback(atoi(event->name), devicewatcher::status::MODIFIED);
-
-            i += EVENT_SIZE + event->len;
+                i += EVENT_SIZE + event->len;
+            }
         }
     }
+
+    void devicewatcher::start() {
+        if (watcher != nullptr)
+            return;
+
+        fd = inotify_init();
+        if (fd < 0) {
+            printf("inotify_init error\n");
+
+        }
+
+        wd = inotify_add_watch(fd, path.c_str(), IN_MODIFY | IN_CREATE | IN_DELETE);
+
+        _watcher = new pthread_t;
+        int rc = pthread_create(watcher, nullptr, &loop, (void *) this);
+        if (rc)
+            printf("pthread_create error code: %d\n", rc);
+
+    }
+
+    void devicewatcher::stop() {
+        if (watcher == nullptr)
+            return;
+
+        int rc;
+
+        rc = pthread_cancel(*watcher);
+
+        if (rc != 0)
+            printf("pthread_cancel error code %d", rc);
+
+        void *res;
+        rc = pthread_join(*watcher, &res);
+        if (rc != 0)
+            printf("pthread_join error code %d", rc);
+
+        if (res != PTHREAD_CANCELED)
+            printf("thread was not canceled normally");
+
+
+        inotify_rm_watch(fd, wd);
+        close(fd);
+    }
+
+    devicewatcher::devicewatcher(const std::string &path, lap_rem::callback<void, int, status> callback)
+            : _callback(callback), path(path) {}
 
 }

@@ -8,7 +8,11 @@
 #include "input_driver.h"
 
 namespace lap_rem::input {
-    int input_driver::init() {
+
+    input_driver::input_driver(lap_rem::callback<void, input_driver::SharedEvent &> callback)
+            : _callback(callback) {}
+
+    int input_driver::start() {
         fd = shm_open(DELEGATE_FOLDER, O_RDWR, 0);
         if (fd == -1) {
             printf("fd error\n");
@@ -23,19 +27,20 @@ namespace lap_rem::input {
             return 2;
         }
 
+        sem_wait(&shmp->server); // let driver know we are ready for events
+
+        worker = new std::thread(&input_driver::loop, this);
         return 0;
 
     }
 
-    void input_driver::next_event(input_driver::SharedEvent &ev) {
-        sem_wait(&shmp->server); // wait for event from driver
-
-
-    }
-
-    void input_driver::post_result(bool handled) {
-
-        sem_post(&shmp->client); // notify driver that logic processing is done
+    [[noreturn]] void input_driver::loop() {
+        while (true) {
+            sem_wait(&shmp->server); // wait for event from driver
+            shmp->buffy[shmp->current_pos].delegated = 0;
+            _callback(shmp->buffy[shmp->current_pos]);
+            sem_post(&shmp->client);
+        }
     }
 
 }

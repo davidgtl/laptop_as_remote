@@ -1,23 +1,19 @@
 #pragma once
 
 #include <string>
+#include "util/callback.hpp"
 
-class devicewatcher {
+namespace lap_rem::input {
+    class devicewatcher {
 
 
-public:
+    public:
 
-    enum status{
-        CREATED, DELETED, MODIFIED
-    };
+        enum status {
+            CREATED, DELETED, MODIFIED
+        };
 
-    struct {
-        int fd;
-        int wd;
-        void (*callback)(int device_id, status status);
-    } _internal = {};
-
-    explicit devicewatcher(const std::string& path, void (*callback)(int device_id, status status));
+        explicit devicewatcher(const std::string &path, lap_rem::callback<void, int, status> callback);
 
 
 // too much work to generalise, features would remain unused
@@ -40,12 +36,18 @@ public:
 
 //    void watch_directory(const std::string &path);
 
-    void start();
+        void start();
 
-    void stop();
+        void stop();
 
-private:
-    std::string path;
-    void *_watcher = nullptr;
+    private:
+        int fd;
+        int wd;
+        callback<void, int, status> _callback;
 
-};
+        std::string path;
+        void *_watcher = nullptr;
+       friend void *loop(void*);
+
+    };
+}

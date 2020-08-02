@@ -2,4 +2,4 @@
 
 #include "discovery.h"
 #include "client.h"
-#include "server.h.h"
+#include "server.h"

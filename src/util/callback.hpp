@@ -1,21 +1,17 @@
 #pragma once
 
-#ifndef LIB_CALLBACK_NAMESPACE
-#define LIB_CALLBACK_NAMESPACE gcallbk
-#endif
-
-namespace LIB_CALLBACK_NAMESPACE {
+namespace lap_rem {
 
     template<typename Return, typename ...Args>
     class callback {
     private:
-        typedef Return (*Generic_Method)(void *ref, Args...);
         void *ref;
         void *func;
 
     public:
         template<typename Class>
         using Method = Return (Class::*)(Args...);
+        typedef Return (*Generic_Method)(void *ref, Args...);
         typedef Return (*Function)(Args...);
 
         template<typename Class>
@@ -33,6 +29,5 @@ namespace LIB_CALLBACK_NAMESPACE {
     };
 }
 
-#undef LIB_CALLBACK_NAMESPACE
 
 

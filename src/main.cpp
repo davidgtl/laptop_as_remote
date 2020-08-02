@@ -2,6 +2,7 @@
 #include <boost/program_options.hpp>
 #include "util/devicewatcher.h"
 #include "network/network.h"
+#include "tests/callbacks.h"
 
 namespace po = boost::program_options;
 namespace lap_rem {
@@ -50,7 +51,6 @@ namespace lap_rem {
     }
 
     void test() {
-
         //lap_rem::input::devices::query();
 
         /*devicewatcher fw(device_changed);

@@ -4,6 +4,7 @@
 #include <boost/array.hpp>
 #include <thread>
 #include "util/array_view.h"
+#include "util/callback.hpp"
 
 namespace lap_rem::network {
 
@@ -27,10 +28,10 @@ namespace lap_rem::network {
         void loop();
 
         std::thread *worker = nullptr;
-        Imessage_callback<T> *callback;
+        callback<void, const array_view<T>&> _callback;
 
     public:
-        server(int port, Imessage_callback<T> &mc);
+        server(int port, callback<void, const array_view<T>&> callback);
 
         void start();
     };

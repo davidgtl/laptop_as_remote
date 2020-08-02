@@ -1,16 +1,12 @@
 #pragma once
 
 #include <semaphore.h>
+#include <thread>
 #include <string>
 #include <vector>
+#include "util/callback.hpp"
 
 namespace lap_rem::input {
-
-    class Icapture_logic {
-    public:
-        virtual bool capture() = 0;
-    };
-
 
     class input_driver {
 
@@ -43,13 +39,9 @@ namespace lap_rem::input {
             struct input_event ev;
         } SharedEvent;
 
-        input_driver() = default;
+        input_driver(callback<void, input_driver::SharedEvent&> callback);
 
-        int init();
-
-        void next_event(SharedEvent &ev);
-
-        void post_result(bool handled);
+        int start();
 
     private:
 
@@ -63,8 +55,14 @@ namespace lap_rem::input {
             SharedEvent buffy[SHMEM_BUFF_LENGTH];
         } SharedMemoryStruct;
 
-        SharedMemoryStruct *shmp;
-        int fd;
+        SharedMemoryStruct *shmp = nullptr;
+        /* set .delegated to >=1 to capture the event */
+        callback<void, input_driver::SharedEvent&> _callback;
+        int fd = 0;
+        std::thread* worker = nullptr;
+
+        [[noreturn]] void loop();
 
     };
+
 }
