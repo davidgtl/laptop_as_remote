@@ -2,7 +2,8 @@
 
 namespace lap_rem::network {
 
-    void server::loop(){
+    template<typename T>
+    void server<T>::loop(){
         using namespace boost::asio;
         using namespace boost::asio::ip;
         using namespace std;
@@ -21,9 +22,7 @@ namespace lap_rem::network {
                 try {
                     // TODO: spam test to see if more than one send can be received
                     int msg_len = socket.receive(boost::asio::buffer(buffy));
-                    string message(buffy.begin(), buffy.begin() + msg_len);
-
-                    callback->on_message(buffy.data(), msg_len);
+                    callback->call(buffy.data(), msg_len);
 
                 } catch (std::exception const &ex) {
                     break;
@@ -34,11 +33,13 @@ namespace lap_rem::network {
         }
     }
 
-    void server::start() {
+    template<typename T>
+    void server<T>::start() {
         worker = new std::thread(&server::loop, this);
     }
 
-    server::server(int port, Imessage_callback& mc) {
+    template<typename T>
+    server<T>::server(int port, Imessage_callback<T>& mc) {
         this->port = port;
         this->callback = &mc;
     }
