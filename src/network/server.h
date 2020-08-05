@@ -22,18 +22,20 @@ namespace lap_rem::network {
 
     template<typename T>
     class server {
+    public:
+        typedef struct { const array_view<T>& data; } on_message_args;
+
+        server(int port, callback<void, on_message_args&> callback);
+
+        void start();
     private:
         int port;
 
         void loop();
 
         std::thread *worker = nullptr;
-        callback<void, const array_view<T>&> _callback;
+        callback<void, on_message_args&> _callback;
 
-    public:
-        server(int port, callback<void, const array_view<T>&> callback);
-
-        void start();
     };
 }
 

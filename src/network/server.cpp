@@ -22,7 +22,7 @@ namespace lap_rem::network {
                 try {
                     // TODO: spam test to see if more than one send can be received
                     int msg_len = socket.receive(boost::asio::buffer(buffy));
-                    _callback(buffy.data(), msg_len);
+                    _callback({buffy.data(), msg_len});
 
                 } catch (std::exception const &ex) {
                     break;
@@ -39,7 +39,7 @@ namespace lap_rem::network {
     }
 
     template<typename T>
-    server<T>::server(int port, callback<void, const array_view<T> &> callback)
+    server<T>::server(int port, callback<void, on_message_args&> callback)
             : port(port), _callback(callback) {}
 
 }

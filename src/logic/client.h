@@ -10,6 +10,7 @@ namespace lap_rem::logic {
         client();
 
         void start();
+        void stop();
 
     private:
         input::input_driver input_driver;

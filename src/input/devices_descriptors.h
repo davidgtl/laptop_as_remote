@@ -67,7 +67,7 @@ namespace lap_rem::input {
         inline static constexpr char path[] = "/del_dev/input/";
         inline static constexpr char config_folder[] = "~/.laptop_remote/";
         inline static constexpr char config_watches[] = "wacthes.conf";
-        inline static devicewatcher dw{path, device_changed};
+        inline static devicewatcher dw{path, device_changed}; // TODO: stop me
 
         static void build_ids();
 
