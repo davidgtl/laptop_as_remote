@@ -3,6 +3,7 @@
 #include "util/devicewatcher.h"
 #include "network/network.h"
 #include "tests/callbacks.h"
+#include "input/emulator.h"
 
 namespace po = boost::program_options;
 namespace lap_rem {
@@ -51,6 +52,7 @@ namespace lap_rem {
     }
 
     void test() {
+        using namespace std::literals::chrono_literals;
         //lap_rem::input::devices::query();
 
         /*devicewatcher fw(device_changed);
@@ -59,6 +61,20 @@ namespace lap_rem {
         sleep(20);
 
         fw.stop();*/
+        printf("starting...\n");
+        input::emulator emu;
+        emu.start();
+        std::cin.get();
+        //std::this_thread::sleep_for(3000ms);
+        emu.send_key(0, true);
+        std::this_thread::sleep_for(50ms);
+        emu.send_key(0, false);
+        std::this_thread::sleep_for(1000ms);
+        emu.send_key(0, true);
+        std::this_thread::sleep_for(50ms);
+        emu.send_key(0, false);
+        emu.stop();
+        printf("stopping...\n");
 
     }
 }
