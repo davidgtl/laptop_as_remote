@@ -16,6 +16,43 @@
 
 namespace lap_rem::input {
 
+    namespace presets {
+        using device_info = emulator::device_info;
+
+        device_info keyboard() {
+            device_info res = {
+                    .name = "Laprem emulated keyboard",
+                    .bus_type = (bus_types) (BUS_USB),
+                    .vendor = 0x1,
+                    .product = 0x1,
+                    .version = 0x0,
+                    .events = {[EV_SYN] = true, [EV_KEY] = true}
+            };
+
+            for (int i = 0; i < KEY_CNT; i++)
+                res.key_bits[i] = true;
+
+            return res;
+        }
+
+        emulator::device_info mouse() {
+            device_info res = {
+                    .name = "Laprem emulated mouse",
+                    .bus_type = (bus_types) (BUS_USB),
+                    .vendor = 0x1,
+                    .product = 0x2,
+                    .version = 0x0,
+                    .events = {[EV_SYN] = true, [EV_KEY] = true, [EV_REL] = true}
+            };
+
+            for (int i = BTN_MISC; i <= BTN_GEAR_UP; i++)
+                res.key_bits[i] = true;
+
+            for (int i = REL_X; i <= REL_MISC; i++)
+                res.rel_bits[i] = true;
+        }
+    }
+
     int emulator::start() {
         struct uinput_setup uinp;
         // Open the input device
@@ -27,35 +64,60 @@ namespace lap_rem::input {
         }
 
         // Setup the uinput device
-        if (ioctl(uinp_fd, UI_SET_EVBIT, EV_KEY) < 0)
-            return -1;
-        /*if (ioctl(uinp_fd, UI_SET_EVBIT, EV_REL) < 0)
-            printf("unable to write");
-        if (ioctl(uinp_fd, UI_SET_RELBIT, REL_X) < 0)
-            printf("unable to write");
-        if (ioctl(uinp_fd, UI_SET_RELBIT, REL_Y) < 0)
-            printf("unable to write");*/
-        for (int i = 1; i < 248; i++) {
-            if(ioctl(uinp_fd, UI_SET_KEYBIT, i) < 0)
-                return -1;
-        }
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_MOUSE);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_TOUCH);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_MOUSE);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_LEFT);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_MIDDLE);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_RIGHT);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_FORWARD);
-        //ioctl(uinp_fd, UI_SET_KEYBIT, BTN_BACK);
+        for (int i = 0; i < sizeof(this->devinfo.events); i++)
+            if (this->devinfo.events[i])
+                if (ioctl(uinp_fd, UI_SET_EVBIT, i) < 0)
+                    return -1;
+
+        if (this->devinfo.events[EV_KEY])
+            for (int i = 0; i < sizeof(this->devinfo.key_bits); i++)
+                if (this->devinfo.key_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_KEYBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_REL])
+            for (int i = 0; i < sizeof(this->devinfo.rel_bits); i++)
+                if (this->devinfo.rel_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_RELBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_ABS])
+            for (int i = 0; i < sizeof(this->devinfo.abs_bits); i++)
+                if (this->devinfo.abs_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_ABSBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_MSC])
+            for (int i = 0; i < sizeof(this->devinfo.msc_bits); i++)
+                if (this->devinfo.msc_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_MSCBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_LED])
+            for (int i = 0; i < sizeof(this->devinfo.led_bits); i++)
+                if (this->devinfo.led_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_LEDBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_SND])
+            for (int i = 0; i < sizeof(this->devinfo.snd_bits); i++)
+                if (this->devinfo.snd_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_SNDBIT, i) < 0)
+                        return -1;
+
+        if (this->devinfo.events[EV_SW])
+            for (int i = 0; i < sizeof(this->devinfo.sw_bits); i++)
+                if (this->devinfo.sw_bits[i])
+                    if (ioctl(uinp_fd, UI_SET_SWBIT, i) < 0)
+                        return -1;
 
 
         memset(&uinp, 0, sizeof(uinp)); // Intialize the uInput device to NULL
-        snprintf(uinp.name, UINPUT_MAX_NAME_SIZE, "uinput-sample");
-        uinp.id.bustype = BUS_USB;
-        uinp.id.vendor = 0x1;
-        uinp.id.product = 0x1;
-        uinp.id.version = 1;
-
+        snprintf(uinp.name, UINPUT_MAX_NAME_SIZE, "%s", devinfo.name);
+        uinp.id.bustype = devinfo.bus_type;
+        uinp.id.vendor = devinfo.vendor;
+        uinp.id.product = devinfo.product;
+        uinp.id.version = devinfo.version;
 
         if (ioctl(uinp_fd, UI_DEV_SETUP, &uinp) < 0)
             printf("Unable to setup UINPUT device.");
@@ -65,7 +127,7 @@ namespace lap_rem::input {
             return -1;
         }
 
-        return 1;
+        return 0;
     }
 
     int emulator::send_event(event_types type, uint16_t code, int32_t value) const {
@@ -95,7 +157,7 @@ namespace lap_rem::input {
     }
 
     int emulator::send_key(uint32_t key, bool down) const {
-        send_event((event_types)EV_KEY, key, down);
+        send_event((event_types) EV_KEY, key, down);
         return 0;
     }
 
@@ -110,16 +172,20 @@ namespace lap_rem::input {
     }
 
     emulator::emulator(emulator::device_preset p) {
-
         switch (p) {
             case keyboard:
-
-
+                this->devinfo = presets::keyboard();
+                break;
+            case mouse:
+                this->devinfo = presets::mouse();
+                break;
+            default:
+                this->devinfo = {};
         }
     }
 
-    emulator::emulator(emulator::device_info) {
-
+    emulator::emulator(emulator::device_info devinfo) {
+        this->devinfo = devinfo;
     }
 
     int emulator::setup_keyboard() {

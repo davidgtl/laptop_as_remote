@@ -6,13 +6,6 @@
 namespace lap_rem::input {
 
     class emulator {
-    private:
-        int send_syn_report() const;
-
-        int uinp_fd;
-
-        int setup_keyboard();
-
     public:
         enum device_preset {
             mouse,
@@ -22,7 +15,7 @@ namespace lap_rem::input {
         };
         typedef struct device_info {
             char name[80];
-            bus_types type;
+            bus_types bus_type;
             uint16_t vendor;
             uint16_t product;
             uint16_t version;
@@ -52,6 +45,13 @@ namespace lap_rem::input {
         int send_key(uint32_t key, bool down) const;
 
         int stop() const;
+    private:
+        int send_syn_report() const;
+
+        int uinp_fd;
+
+        int setup_keyboard();
+        device_info devinfo;
     };
 }
 
