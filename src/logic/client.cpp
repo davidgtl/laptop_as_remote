@@ -4,7 +4,7 @@
 namespace lap_rem::logic {
     using namespace input;
 
-    client::client() : input_driver({*this, &client::on_input}) {
+    client::client() : input_driver({*this, &client::on_input}), emulator() {
 
     }
 
@@ -12,7 +12,8 @@ namespace lap_rem::logic {
         devices::query();
         devices::loadwatched();
 
-        input_driver.start();
+        input_driver.start(); //TODO: conf and routing
+
 
 
     }

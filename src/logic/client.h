@@ -1,6 +1,7 @@
 #pragma once
 #include "network/network.h"
 #include "input/input_driver.h"
+#include "input/emulator.h"
 #include "input/devices_descriptors.h"
 
 namespace lap_rem::logic {
@@ -14,6 +15,7 @@ namespace lap_rem::logic {
 
     private:
         input::input_driver input_driver;
+        input::emulator emulator;
         void on_input(input::input_driver::SharedEvent& sev);
 
     };

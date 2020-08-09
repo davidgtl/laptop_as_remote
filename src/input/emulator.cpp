@@ -53,7 +53,22 @@ namespace lap_rem::input {
         }
     }
 
-    int emulator::start() {
+    int emulator::start(emulator::device_preset p) {
+        emulator::device_info devinfo;
+        switch (p) {
+            case keyboard:
+                devinfo = presets::keyboard();
+                break;
+            case mouse:
+                devinfo = presets::mouse();
+                break;
+            default:
+                devinfo = {};
+        }
+        return start(devinfo);
+    }
+
+    int emulator::start(emulator::device_info devinfo) {
         struct uinput_setup uinp;
         // Open the input device
         uinp_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
@@ -64,50 +79,50 @@ namespace lap_rem::input {
         }
 
         // Setup the uinput device
-        for (int i = 0; i < sizeof(this->devinfo.events); i++)
-            if (this->devinfo.events[i])
+        for (int i = 0; i < sizeof(devinfo.events); i++)
+            if (devinfo.events[i])
                 if (ioctl(uinp_fd, UI_SET_EVBIT, i) < 0)
                     return -1;
 
-        if (this->devinfo.events[EV_KEY])
-            for (int i = 0; i < sizeof(this->devinfo.key_bits); i++)
-                if (this->devinfo.key_bits[i])
+        if (devinfo.events[EV_KEY])
+            for (int i = 0; i < sizeof(devinfo.key_bits); i++)
+                if (devinfo.key_bits[i])
                     if (ioctl(uinp_fd, UI_SET_KEYBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_REL])
-            for (int i = 0; i < sizeof(this->devinfo.rel_bits); i++)
-                if (this->devinfo.rel_bits[i])
+        if (devinfo.events[EV_REL])
+            for (int i = 0; i < sizeof(devinfo.rel_bits); i++)
+                if (devinfo.rel_bits[i])
                     if (ioctl(uinp_fd, UI_SET_RELBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_ABS])
-            for (int i = 0; i < sizeof(this->devinfo.abs_bits); i++)
-                if (this->devinfo.abs_bits[i])
+        if (devinfo.events[EV_ABS])
+            for (int i = 0; i < sizeof(devinfo.abs_bits); i++)
+                if (devinfo.abs_bits[i])
                     if (ioctl(uinp_fd, UI_SET_ABSBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_MSC])
-            for (int i = 0; i < sizeof(this->devinfo.msc_bits); i++)
-                if (this->devinfo.msc_bits[i])
+        if (devinfo.events[EV_MSC])
+            for (int i = 0; i < sizeof(devinfo.msc_bits); i++)
+                if (devinfo.msc_bits[i])
                     if (ioctl(uinp_fd, UI_SET_MSCBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_LED])
-            for (int i = 0; i < sizeof(this->devinfo.led_bits); i++)
-                if (this->devinfo.led_bits[i])
+        if (devinfo.events[EV_LED])
+            for (int i = 0; i < sizeof(devinfo.led_bits); i++)
+                if (devinfo.led_bits[i])
                     if (ioctl(uinp_fd, UI_SET_LEDBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_SND])
-            for (int i = 0; i < sizeof(this->devinfo.snd_bits); i++)
-                if (this->devinfo.snd_bits[i])
+        if (devinfo.events[EV_SND])
+            for (int i = 0; i < sizeof(devinfo.snd_bits); i++)
+                if (devinfo.snd_bits[i])
                     if (ioctl(uinp_fd, UI_SET_SNDBIT, i) < 0)
                         return -1;
 
-        if (this->devinfo.events[EV_SW])
-            for (int i = 0; i < sizeof(this->devinfo.sw_bits); i++)
-                if (this->devinfo.sw_bits[i])
+        if (devinfo.events[EV_SW])
+            for (int i = 0; i < sizeof(devinfo.sw_bits); i++)
+                if (devinfo.sw_bits[i])
                     if (ioctl(uinp_fd, UI_SET_SWBIT, i) < 0)
                         return -1;
 
@@ -171,25 +186,7 @@ namespace lap_rem::input {
         return 0;
     }
 
-    emulator::emulator(emulator::device_preset p) {
-        switch (p) {
-            case keyboard:
-                this->devinfo = presets::keyboard();
-                break;
-            case mouse:
-                this->devinfo = presets::mouse();
-                break;
-            default:
-                this->devinfo = {};
-        }
-    }
-
-    emulator::emulator(emulator::device_info devinfo) {
-        this->devinfo = devinfo;
-    }
-
-    int emulator::setup_keyboard() {
-        return 0;
+    emulator::emulator() {
     }
 
 }

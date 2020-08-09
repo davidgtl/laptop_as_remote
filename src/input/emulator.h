@@ -32,11 +32,10 @@ namespace lap_rem::input {
 
         } device_info;
 
-        emulator(device_preset p);
+        emulator();
 
-        emulator(device_info info);
-
-        int start();
+        int start(device_preset p);
+        int start(device_info info);
 
         int send_event(event_types type, uint16_t code, int32_t value) const;
 
@@ -49,9 +48,6 @@ namespace lap_rem::input {
         int send_syn_report() const;
 
         int uinp_fd;
-
-        int setup_keyboard();
-        device_info devinfo;
     };
 }
 
