@@ -1,6 +1,6 @@
 #include "client.h"
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     client::client(const boost::asio::ip::address& addr, int port) {
         this->addr = addr;

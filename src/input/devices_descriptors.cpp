@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <filesystem>
 
-namespace lap_rem::input {
+namespace laprem::input {
 
     void devices::device_changed(int id, devicewatcher::status status) {
         devices::query();

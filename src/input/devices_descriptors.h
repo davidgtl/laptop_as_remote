@@ -4,49 +4,63 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+//#include <unistd.h>
+//#include <sys/types.h>
+//#include <sys/stat.h>
+//#include <fcntl.h>
 #include <filesystem>
 #include <iostream>
 #include <cstring>
 #include <fstream>
 #include "util/devicewatcher.h"
+#include "input/linux_structs.h"
 
 
-namespace lap_rem::input {
+namespace laprem::input {
 
-    typedef struct _device_descriptor {
-        std::string name;
+    typedef struct device_info {
+        char name[80];
+        bus_types bus_type;
+        uint16_t vendor;
+        uint16_t product;
+        uint16_t version;
+        bool events[event_types::EV_CNT];
+        bool key_bits[event_code::key::KEY_CNT];
+        bool rel_bits[event_code::rel::REL_CNT];
+        bool abs_bits[event_code::abs::ABS_CNT];
+        bool msc_bits[event_code::msc::MSC_CNT];
+        bool led_bits[event_code::led::LED_CNT];
+        bool snd_bits[event_code::snd::SND_CNT];
+        //bool ff_bits[event_code::keys::KEY_CNT];
+        bool sw_bits[event_code::sw::SW_CNT];
+        //bool prop_bits[event_code::keys::KEY_CNT];
+
+    } device_info;
+
+    typedef struct device_descriptor {
         std::string unique;
-        u_int32_t vendor;
-        u_int32_t product;
         std::string logical_location;
         std::string physical_location;
-        u_int32_t bus_type;
-        u_int32_t firmware_version;
-
         std::string nickname;
         u_int32_t uid;
+        device_info device_info;
 
 
-
-        bool operator==(const _device_descriptor &rhs) const {
-            const auto *ptr = dynamic_cast<const _device_descriptor *>(&rhs);
+        bool operator==(const device_descriptor &rhs) const {
+            const auto *ptr = dynamic_cast<const device_descriptor *>(&rhs);
             if (ptr != nullptr)
-                return this->vendor == rhs.vendor &&
-                       this->product == rhs.product &&
-                       this->name == rhs.name;
+                return this->device_info.vendor == rhs.device_info.vendor &&
+                       this->device_info.product == rhs.device_info.product &&
+                       this->device_info.name == rhs.device_info.name;
 
             return false;
         }
-        bool operator!=(const _device_descriptor &rhs) const {
-            const auto *ptr = dynamic_cast<const _device_descriptor *>(&rhs);
+        bool operator!=(const device_descriptor &rhs) const {
+            const auto *ptr = dynamic_cast<const device_descriptor *>(&rhs);
             if (ptr != nullptr)
-                return !(this->vendor == rhs.vendor &&
-                       this->product == rhs.product &&
-                       this->name == rhs.name);
+                return !(this->device_info.vendor == rhs.device_info.vendor &&
+                       this->device_info.product == rhs.device_info.product &&
+                       this->device_info.name == rhs.device_info.name);
 
             return true;
         }
@@ -67,7 +81,8 @@ namespace lap_rem::input {
         inline static constexpr char path[] = "/del_dev/input/";
         inline static constexpr char config_folder[] = "~/.laptop_remote/";
         inline static constexpr char config_watches[] = "wacthes.conf";
-        inline static devicewatcher dw{path, device_changed}; // TODO: stop me
+        inline static devicewatcher dw{path, device_changed}
+        ; // TODO: stop me
 
         static void build_ids();
 
@@ -77,24 +92,25 @@ namespace lap_rem::input {
             auto value = line.substr(split + 1);
 
             if (property == "Name")
-                dd.name = value;
+                strncpy(dd.device_info.name, value.c_str(), sizeof(dd.device_info.name));
             else if (property == "Unique")
                 dd.unique = value;
             else if (property == "Vendor")
-                dd.vendor = std::stoi(value);
+                dd.device_info.vendor = std::stoi(value);
             else if (property == "Product")
-                dd.product = std::stoi(value);
+                dd.device_info.product = std::stoi(value);
             else if (property == "Logical location")
                 dd.logical_location = value;
             else if (property == "Physical location")
                 dd.physical_location = value;
             else if (property == "Bus type")
-                dd.bus_type = std::stoi(value);
+                dd.device_info.bus_type = static_cast<bus_types>(std::stoi(value));
             else if (property == "Firmware version")
-                dd.firmware_version = std::stoi(value);
+                dd.device_info.version = std::stoi(value);
             else if (property == "* Device unique nickname")
                 dd.nickname = value;
             else std::cout << "Could not find property " << property << "\n";
+            //TODO: read device bits
 
         }
 

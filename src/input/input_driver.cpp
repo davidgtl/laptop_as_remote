@@ -7,9 +7,9 @@
 
 #include "input_driver.h"
 
-namespace lap_rem::input {
+namespace laprem::input {
 
-    input_driver::input_driver(lap_rem::callback<void, input_driver::SharedEvent &> callback)
+    input_driver::input_driver(laprem::callback<void, input_driver::SharedEvent &, size_t> callback)
             : _callback(callback) {}
 
     int input_driver::start() {
@@ -38,9 +38,13 @@ namespace lap_rem::input {
         while (true) {
             sem_wait(&shmp->server); // wait for event from driver
             shmp->buffy[shmp->current_pos].delegated = 0;
-            _callback(shmp->buffy[shmp->current_pos]);
+            _callback(shmp->buffy[shmp->current_pos], shmp->current_pos);
             sem_post(&shmp->client);
         }
+    }
+
+    input_driver::SharedEvent &input_driver::event(size_t position) {
+        return shmp->buffy[position];
     }
 
 }

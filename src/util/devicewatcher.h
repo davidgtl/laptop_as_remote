@@ -3,7 +3,7 @@
 #include <string>
 #include "util/callback.hpp"
 
-namespace lap_rem::input {
+namespace laprem::input {
     class devicewatcher {
 
 
@@ -13,7 +13,7 @@ namespace lap_rem::input {
             CREATED, DELETED, MODIFIED
         };
 
-        explicit devicewatcher(const std::string &path, lap_rem::callback<void, int, status> callback);
+        explicit devicewatcher(const std::string &path, laprem::callback<void, int, status> callback);
 
 
 // too much work to generalise, features would remain unused

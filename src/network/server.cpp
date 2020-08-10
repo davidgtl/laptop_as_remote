@@ -1,6 +1,6 @@
 #include "server.h"
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     template<typename T>
     void server<T>::loop() {

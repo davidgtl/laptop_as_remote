@@ -2,7 +2,7 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     discovery::discovery(int port) {
         this->port = port;

@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-namespace lap_rem::input {
+namespace laprem::input {
 
     namespace presets {
         using device_info = emulator::device_info;

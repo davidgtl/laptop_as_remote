@@ -2,7 +2,7 @@
 #include <string>
 
 //based on linux/input.h
-namespace lap_rem::input {
+namespace laprem::input {
 
     typedef struct input_event {
         struct timeval time = {0, 0};

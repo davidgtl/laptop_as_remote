@@ -4,7 +4,7 @@
 #include <thread>
 #include <vector>
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     class discovery {
     private:

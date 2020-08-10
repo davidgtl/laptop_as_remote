@@ -6,7 +6,7 @@
 #include "input/emulator.h"
 
 namespace po = boost::program_options;
-namespace lap_rem {
+namespace laprem {
     const int port = 2222;
 
     void server() {
@@ -18,19 +18,7 @@ namespace lap_rem {
     }
 
     void client() {
-        using namespace network;
-        discovery d(57897);
-        boost::asio::ip::address addr;
-        if (d.search_listeners("server1", addr)) {
-            std::cout << "Server found\n";
 
-            network::client client(addr, 57896);
-            client.connect();
-            client.send("hello");
-
-        }
-        else
-            std::cout << "Server not found\n";
 
     }
 
@@ -81,7 +69,7 @@ namespace lap_rem {
 
 int main(int ac, char *av[]) {
     using namespace std;
-    using namespace lap_rem;
+    using namespace laprem;
 
     int opt;
     po::options_description desc("Allowed options");

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace lap_rem {
+namespace laprem {
 
     template<typename T>
     class array_view {

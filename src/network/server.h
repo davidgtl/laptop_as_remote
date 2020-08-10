@@ -6,7 +6,7 @@
 #include "util/array_view.h"
 #include "util/callback.hpp"
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     template<typename T>
     class Imessage_callback {

@@ -5,7 +5,7 @@
 #include <boost/array.hpp>
 #include <thread>
 
-namespace lap_rem::network {
+namespace laprem::network {
 
     class client {
     private:
@@ -23,8 +23,13 @@ namespace lap_rem::network {
         void disconnect();
 
         template<typename T>
-        void send(const T &data) {
+        void send(const T &data) const{
             socket->send(boost::asio::buffer(data));
+        }
+
+        template<typename T>
+        void send_buffer(const T &data) const{
+            socket->send(data);
         }
 
 

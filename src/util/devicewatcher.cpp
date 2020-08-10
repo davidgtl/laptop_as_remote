@@ -10,7 +10,7 @@
 
 #define watcher ((pthread_t *) _watcher)
 
-namespace lap_rem::input {
+namespace laprem::input {
 
     static constexpr u_int EVENT_SIZE = sizeof(struct inotify_event);
     static constexpr u_int BUF_LEN = 1024 * (EVENT_SIZE + 64);
@@ -86,7 +86,7 @@ namespace lap_rem::input {
         close(fd);
     }
 
-    devicewatcher::devicewatcher(const std::string &path, lap_rem::callback<void, int, status> callback)
+    devicewatcher::devicewatcher(const std::string &path, laprem::callback<void, int, status> callback)
             : _callback(callback), path(path) {}
 
 }

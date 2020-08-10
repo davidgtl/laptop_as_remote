@@ -2,8 +2,9 @@
 
 #include <string>
 #include "input/linux_structs.h"
+#include "devices_descriptors.h"
 
-namespace lap_rem::input {
+namespace laprem::input {
 
     class emulator {
     public:
@@ -13,24 +14,6 @@ namespace lap_rem::input {
             touchpad,
             tablet
         };
-        typedef struct device_info {
-            char name[80];
-            bus_types bus_type;
-            uint16_t vendor;
-            uint16_t product;
-            uint16_t version;
-            bool events[event_types::EV_CNT];
-            bool key_bits[event_code::key::KEY_CNT];
-            bool rel_bits[event_code::rel::REL_CNT];
-            bool abs_bits[event_code::abs::ABS_CNT];
-            bool msc_bits[event_code::msc::MSC_CNT];
-            bool led_bits[event_code::led::LED_CNT];
-            bool snd_bits[event_code::snd::SND_CNT];
-            //bool ff_bits[event_code::keys::KEY_CNT];
-            bool sw_bits[event_code::sw::SW_CNT];
-            //bool prop_bits[event_code::keys::KEY_CNT];
-
-        } device_info;
 
         emulator();
 

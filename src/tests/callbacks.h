@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace tests::callbacks{
-    using namespace lap_rem;
+    using namespace laprem;
     void test1();
     void test2();
 }

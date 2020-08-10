@@ -7,7 +7,7 @@
 #include "util/callback.hpp"
 #include "linux_structs.h"
 
-namespace lap_rem::input {
+namespace laprem::input {
 
     class input_driver {
 
@@ -19,9 +19,11 @@ namespace lap_rem::input {
             input_event ev;
         } SharedEvent;
 
-        input_driver(callback<void, input_driver::SharedEvent&> callback);
+        input_driver(callback<void, input_driver::SharedEvent&, size_t> callback);
 
         int start();
+
+        input_driver::SharedEvent& event(size_t position);
 
     private:
 
@@ -37,7 +39,7 @@ namespace lap_rem::input {
 
         SharedMemoryStruct *shmp = nullptr;
         /* set .delegated to >=1 to capture the event */
-        callback<void, input_driver::SharedEvent&> _callback;
+        callback<void, input_driver::SharedEvent&, size_t> _callback;
         int fd = 0;
         std::thread* worker = nullptr;
 
