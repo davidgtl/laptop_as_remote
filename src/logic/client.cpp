@@ -26,7 +26,13 @@ namespace laprem::logic {
             network::client client(addr, 57896);
             client.connect();
             //client.send("hello");
-            std::unique_lock <std::mutex> lock(input_mutex);
+
+            for (auto &elem:devices::iterator) // Populate my bits senpai
+                if (devices::iswatched(elem.first))
+                    send_message(client, elem.second);
+
+
+            std::unique_lock<std::mutex> lock(input_mutex);
 
             while (true) {
                 lock.lock();
@@ -60,7 +66,7 @@ namespace laprem::logic {
         if (devices::iswatched(sev.device_identifier) && filter_events(sev)) {
             sev.delegated = 1;
             event_queue.push(position);
-            std::unique_lock <std::mutex> lock(input_mutex);
+            std::unique_lock<std::mutex> lock(input_mutex);
             lock.unlock();
         }
     }

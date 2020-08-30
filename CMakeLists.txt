@@ -11,8 +11,8 @@ find_package(Boost 1.71.0 REQUIRED system program_options)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-# set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries")
-include_directories("${SRC_DIR}")
+set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs")
+include_directories(${SRC_DIR} ${LIB_DIR})
 
 target_link_libraries(${PROJECT_NAME}  ${Boost_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}  rt)

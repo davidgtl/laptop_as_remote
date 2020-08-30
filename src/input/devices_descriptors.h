@@ -55,12 +55,13 @@ namespace laprem::input {
 
             return false;
         }
+
         bool operator!=(const device_descriptor &rhs) const {
             const auto *ptr = dynamic_cast<const device_descriptor *>(&rhs);
             if (ptr != nullptr)
                 return !(this->device_info.vendor == rhs.device_info.vendor &&
-                       this->device_info.product == rhs.device_info.product &&
-                       this->device_info.name == rhs.device_info.name);
+                         this->device_info.product == rhs.device_info.product &&
+                         this->device_info.name == rhs.device_info.name);
 
             return true;
         }
@@ -78,11 +79,10 @@ namespace laprem::input {
         static void device_changed(int id, devicewatcher::status status);
 
         static void update_device(int id);
+
         inline static constexpr char path[] = "/del_dev/input/";
-        inline static constexpr char config_folder[] = "~/.laptop_remote/";
-        inline static constexpr char config_watches[] = "wacthes.conf";
-        inline static devicewatcher dw{path, device_changed}
-        ; // TODO: stop me
+
+        inline static devicewatcher dw{path, device_changed}; // TODO: stop me
 
         static void build_ids();
 
@@ -116,10 +116,24 @@ namespace laprem::input {
 
     public:
         static void query();
+
         static void watch(int id);
+
         static bool iswatched(int id);
+
         static void savewatched();
+
         static void loadwatched();
+
+        static struct {
+            auto begin() {
+                return _devices.begin();
+            }
+
+            auto end() {
+                return _devices.end();
+            }
+        } iterator;
     };
 }
 

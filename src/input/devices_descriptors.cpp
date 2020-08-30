@@ -70,9 +70,9 @@ namespace laprem::input {
         int cid = 0;
         for (auto &e: watched) {
             conf << "* Device unique nickname:device" << cid << "\n";
-            conf << "Name:" << e.name << "\n";
-            conf << "Vendor:" << e.vendor << "\n";
-            conf << "Product:" << e.product << "\n";
+            conf << "Name:" << e.device_info.name << "\n";
+            conf << "Vendor:" << e.device_info.vendor << "\n";
+            conf << "Product:" << e.device_info.product << "\n";
             conf << "\n";
         }
 
