@@ -30,6 +30,7 @@ namespace laprem::network {
         void start();
     private:
         int port;
+        bool is_running;
 
         void loop();
 
