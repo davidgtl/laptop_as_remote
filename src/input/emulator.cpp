@@ -17,7 +17,7 @@
 namespace laprem::input {
 
     namespace presets {
-        using device_info = emulator::device_info;
+        using device_info = device_info;
 
         device_info keyboard() {
             device_info res = {
@@ -35,7 +35,7 @@ namespace laprem::input {
             return res;
         }
 
-        emulator::device_info mouse() {
+        device_info mouse() {
             device_info res = {
                     .name = "Laprem emulated mouse",
                     .bus_type = (bus_types) (BUS_USB),
@@ -54,7 +54,7 @@ namespace laprem::input {
     }
 
     int emulator::start(emulator::device_preset p) {
-        emulator::device_info devinfo;
+        device_info devinfo;
         switch (p) {
             case keyboard:
                 devinfo = presets::keyboard();
@@ -68,7 +68,7 @@ namespace laprem::input {
         return start(devinfo);
     }
 
-    int emulator::start(emulator::device_info devinfo) {
+    int emulator::start(device_info devinfo) {
         struct uinput_setup uinp;
         // Open the input device
         uinp_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);

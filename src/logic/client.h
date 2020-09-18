@@ -13,7 +13,7 @@ namespace laprem::logic {
     public:
         client();
 
-        void start();
+        [[noreturn]] void start();
 
         void stop();
 

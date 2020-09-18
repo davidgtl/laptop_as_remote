@@ -1,17 +1,21 @@
 #pragma once
 
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/stream_buffer.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
+//#include <boost/iostreams/stream.hpp>
+//#include <boost/iostreams/stream_buffer.hpp>
+//#include <boost/archive/binary_iarchive.hpp>
+//#include <boost/archive/binary_oarchive.hpp>
+
+#include <json.hpp>
 #include <input/linux_structs.h>
 #include <input/devices_descriptors.h>
 #include <network/client.h>
 
+/*
 BOOST_IS_BITWISE_SERIALIZABLE(laprem::input::input_event)
 BOOST_IS_BITWISE_SERIALIZABLE(laprem::input::input_driver::SharedEvent)
 BOOST_IS_BITWISE_SERIALIZABLE(laprem::input::device_info)
 BOOST_IS_BITWISE_SERIALIZABLE(laprem::input::device_descriptor)
+*/
 
 namespace laprem::logic {
 
@@ -25,22 +29,24 @@ namespace laprem::logic {
 
     template<>
     struct message<laprem::input::device_descriptor>{
-        inline static message_type header = DEVICE_DESCRIPTOR;
+        inline static message_type type = DEVICE_DESCRIPTOR;
     };
 
     template<>
     struct message<laprem::input::input_driver::SharedEvent>{
-        inline static message_type header = INPUT_EVENT;
+        inline static message_type type = INPUT_EVENT;
     };
 
     template<typename T>
     void send_message(const network::client& c, const T& data){
-        typedef boost::iostreams::basic_array_source<char> Device;
-        std::vector<u_char> buffy_vec(sizeof(T) + sizeof(message_type));
-        boost::iostreams::stream_buffer<Device> buffy(buffy_vec);
-        boost::archive::binary_oarchive archive(buffy, boost::archive::no_header);
-        archive << message<T>::header;
-        archive << buffy;
+        using namespace nlohmann;
+
+        json jdata = data;
+        json jmessage;
+        jmessage["type"] = message<T>::header;
+        jmessage["data"] = jdata;
+        std::vector<std::uint8_t> buffy = json::to_msgpack(jmessage);
+
         c.send_buffer(buffy);
     }
 

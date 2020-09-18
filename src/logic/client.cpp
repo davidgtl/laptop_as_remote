@@ -11,7 +11,7 @@ namespace laprem::logic {
 
     }
 
-    void client::start() {
+    [[noreturn]] void client::start() {
         devices::query();
         devices::loadwatched();
 
@@ -42,7 +42,7 @@ namespace laprem::logic {
                 input::input_driver::SharedEvent &sev =
                         input_driver.event(event_queue.pop());
 
-                send_message(client, sev.ev);
+                send_message(client, sev.ev);//TODO: create message structure
             }
         } else
             std::cout << "Server not found\n";
