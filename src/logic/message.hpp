@@ -5,10 +5,10 @@
 //#include <boost/archive/binary_iarchive.hpp>
 //#include <boost/archive/binary_oarchive.hpp>
 
-#include <json.hpp>
 #include <input/linux_structs.h>
 #include <input/devices_descriptors.h>
 #include <network/client.h>
+#include "input/serialization.h"
 
 /*
 BOOST_IS_BITWISE_SERIALIZABLE(laprem::input::input_event)

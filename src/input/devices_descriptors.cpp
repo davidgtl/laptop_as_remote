@@ -28,7 +28,7 @@ namespace laprem::input {
         while (std::getline(file, line))
             populate(dd, line);
 
-        dd.uid = id;
+        dd.device_identifier = id;
         devices::_devices[id] = dd;
         build_ids();
     }
@@ -47,7 +47,7 @@ namespace laprem::input {
             while (std::getline(file, line))
                 populate(dd, line);
 
-            dd.uid = id;
+            dd.device_identifier = id;
             devices::_devices[id] = dd;
         }
 
@@ -121,7 +121,7 @@ namespace laprem::input {
         for (auto &w: watched)
             for (auto &it : _devices) {
                 if (it.second != w) continue;
-                w.uid = it.first;
+                w.device_identifier = it.first;
                 if (it.first < 32)
                     lookup_event |= 1 << it.first;
                 else

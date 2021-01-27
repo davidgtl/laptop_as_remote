@@ -29,7 +29,8 @@ namespace laprem::logic {
 
             for (auto &elem:devices::iterator) // Populate my bits senpai
                 if (devices::iswatched(elem.first))
-                    send_message(client, elem.second);
+                    send_message(client, elem.second); //TODO: create custom device, pass-through or additional logic
+
 
 
             std::unique_lock<std::mutex> lock(input_mutex);

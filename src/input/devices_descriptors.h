@@ -42,7 +42,7 @@ namespace laprem::input {
         std::string logical_location;
         std::string physical_location;
         std::string nickname;
-        u_int32_t uid;
+        u_int32_t device_identifier;
         device_info device_info;
 
 
